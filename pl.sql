@@ -20,6 +20,21 @@ create or replace package pl as
               print_null_str in boolean  := true )
   return varchar2;
 
+  function p( date_value     in timestamp,
+              format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss.ff',
+              print_null_str in boolean  := true )
+  return varchar2;
+
+  function p( date_value     in timestamp with time zone,
+              format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss.ff tzh:tzm',
+              print_null_str in boolean  := true )
+  return varchar2;
+
+  function p( date_value     in timestamp with local time zone,
+              format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss.ff',
+              print_null_str in boolean  := true )
+  return varchar2;
+
   /* Функция формирования строки для логирования путем конкатенации строк через разделитель
    * Разделитель добляется только если строка которую хотели добавить не null
    * При передаче true в параметр force_add_separator, разделитель  будет добавлен в любом случае.
@@ -96,6 +111,66 @@ create or replace package body pl as
 
   function p( date_value     in date,
               format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss',
+              print_null_str in boolean  := true )
+  return varchar2
+  is
+    result varchar2(150);
+  begin
+    if date_value is null then
+      if print_null_str then
+        result := null_str;
+      end if;
+    elsif format is not null then
+      result := to_char(date_value, format);
+    else
+      result := to_char(date_value);
+    end if;
+
+    return result;
+  end p;
+
+  function p( date_value     in timestamp,
+              format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss.ff',
+              print_null_str in boolean  := true )
+  return varchar2
+  is
+    result varchar2(150);
+  begin
+    if date_value is null then
+      if print_null_str then
+        result := null_str;
+      end if;
+    elsif format is not null then
+      result := to_char(date_value, format);
+    else
+      result := to_char(date_value);
+    end if;
+
+    return result;
+  end p;
+
+  function p( date_value     in timestamp with time zone,
+              format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss.ff tzh:tzm',
+              print_null_str in boolean  := true )
+  return varchar2
+  is
+    result varchar2(150);
+  begin
+    if date_value is null then
+      if print_null_str then
+        result := null_str;
+      end if;
+    elsif format is not null then
+      result := to_char(date_value, format);
+    else
+      result := to_char(date_value);
+    end if;
+
+    return result;
+  end p;
+
+  function p( date_value     in timestamp with local time zone,
+              format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss.ff',
               print_null_str in boolean  := true )
   return varchar2
   is
