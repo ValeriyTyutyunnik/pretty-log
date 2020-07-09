@@ -1,22 +1,23 @@
 create or replace package pl as
 
   /* Перегруженные функции для приведения переменных базовых типов к строке
-   * По умолчанию или при передаче true параметру print_null null-значения подменяются на строку 'null'
+   * По умолчанию или при передаче true параметру print_null_str null-значения подменяются на строку 'null'
    */
-  function p (str_value  in varchar2,
-              print_null in boolean := true)
+  function p (str_value      in varchar2,
+              print_null_str in boolean := true)
   return varchar2;
 
-  function p (bool_value in boolean,
-              print_null in boolean := true)
+  function p (bool_value     in boolean,
+              print_null_str in boolean := true)
   return varchar2;
 
-  function p (num_value  in number,
-              print_null in boolean := true)
+  function p (num_value      in number,
+              print_null_str in boolean := true)
   return varchar2;
 
-  function p (date_value in date,
-              print_null in boolean := true)
+  function p( date_value     in date,
+              format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss',
+              print_null_str in boolean  := true )
   return varchar2;
 
   /* Функция формирования строки для логирования путем конкатенации строк через разделитель
@@ -48,28 +49,28 @@ create or replace package body pl as
   null_str constant varchar2(5 char) := 'null';
 
   /* Перегруженные функции для приведения переменных базовых типов к строке
-   * По умолчанию или при передаче true параметру print_null null-значения подменяются на строку 'null'
+   * По умолчанию или при передаче true параметру print_null_str null-значения подменяются на строку 'null'
    */
-  function p( str_value  in varchar2,
-              print_null in boolean := true )
+  function p( str_value      in varchar2,
+              print_null_str in boolean := true )
   return varchar2
   is
   begin
-    if print_null then
-      return nvl(str_value, null_str);
+    if print_null_str and str_value is null then
+      return null_str;
     end if;
 
     return str_value;
   end p;
 
-  function p( bool_value in boolean,
-              print_null in boolean := true )
+  function p( bool_value     in boolean,
+              print_null_str in boolean := true )
   return varchar2
   is
    result varchar2(6 char);
   begin
     if bool_value is null then
-      if print_null then
+      if print_null_str then
         result := null_str;
       end if;
     elsif bool_value then
@@ -81,32 +82,33 @@ create or replace package body pl as
     return result;
   end p;
 
-  function p( num_value  in number,
-              print_null in boolean := true )
+  function p( num_value      in number,
+              print_null_str in boolean := true )
   return varchar2
   is
   begin
-    if print_null then
+    if print_null_str then
       return nvl(to_char(num_value), null_str);
     end if;
 
     return to_char(num_value);
   end p;
 
-  function p( date_value in date,
-              print_null in boolean := true )
+  function p( date_value     in date,
+              format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss',
+              print_null_str in boolean  := true )
   return varchar2
   is
-    result varchar2(100);
+    result varchar2(150);
   begin
     if date_value is null then
-      if print_null then
-        result := 'null';
+      if print_null_str then
+        result := null_str;
       end if;
-    elsif date_value = trunc(date_value, 'dd') then
-      result := to_char(date_value, 'dd/mm/yyyy');
+    elsif format is not null then
+      result := to_char(date_value, format);
     else
-      result := to_char(date_value, 'dd/mm/yyyy hh24:mi:ss');
+      result := to_char(date_value);
     end if;
 
     return result;
