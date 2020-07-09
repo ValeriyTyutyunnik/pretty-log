@@ -21,7 +21,7 @@ create or replace package pl as
 
   /* Функция формирования строки для логирования путем конкатенации строк через разделитель
    * Разделитель добляется только если строка которую хотели добавить не null
-   * При передаче true в параметр force_add_separator, разделитель  будет добавлен в любом случае. 
+   * При передаче true в параметр force_add_separator, разделитель  будет добавлен в любом случае.
    * Это может быть нужно когда ожидается жесткий порядок значений в строке
    * Параметром limit_length регулируется максимальная длина возвращаемой строки
    */
@@ -31,6 +31,12 @@ create or replace package pl as
                force_add_sep in boolean := false,
                limit_length  in integer := 32767 )
   return varchar2;
+
+  procedure fm( cur_message   in out varchar2,
+                add_text      in     varchar2,
+                separator     in     varchar2 := ', ',
+                force_add_sep in     boolean := false,
+                limit_length  in     integer := 32767 );
 
 end pl;
 /
@@ -108,7 +114,7 @@ create or replace package body pl as
 
   /* Функция формирования строки для логирования путем конкатенации строк через разделитель
    * Разделитель добляется только если строка которую хотели добавить не null
-   * При передаче true в параметр force_add_separator, разделитель  будет добавлен в любом случае. 
+   * При передаче true в параметр force_add_separator, разделитель  будет добавлен в любом случае.
    * Это может быть нужно когда ожидается жесткий порядок значений в строке
    * Параметром limit_length регулируется максимальная длина возвращаемой строки
    */
@@ -136,6 +142,16 @@ create or replace package body pl as
 
     return substr(result, 1, limit);
   end fm;
+
+  procedure fm( cur_message   in out varchar2,
+                add_text      in     varchar2,
+                separator     in     varchar2 := ', ',
+                force_add_sep in     boolean := false,
+                limit_length  in     integer := 32767 )
+  is
+  begin
+    cur_message := fm(cur_message, add_text, separator, force_add_sep, limit_length);
+  end;
 
 end pl;
 /
