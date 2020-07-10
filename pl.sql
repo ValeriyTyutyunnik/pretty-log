@@ -12,6 +12,7 @@ create or replace package pl as
   return varchar2;
 
   function p (num_value      in number,
+              format         in varchar2 := null,
               print_null_str in boolean := true)
   return varchar2;
 
@@ -98,15 +99,23 @@ create or replace package body pl as
   end p;
 
   function p( num_value      in number,
-              print_null_str in boolean := true )
+              format         in varchar2 := null,
+              print_null_str in boolean  := true )
   return varchar2
   is
+    result varchar2(1000);
   begin
-    if print_null_str then
-      return nvl(to_char(num_value), null_str);
+    if num_value is null then
+      if print_null_str then
+        result := null_str;
+      end if;
+    elsif format is not null then
+      result := to_char(num_value, format);
+    else
+      result := to_char(num_value);
     end if;
 
-    return to_char(num_value);
+    return result;
   end p;
 
   function p( date_value     in date,
@@ -114,7 +123,7 @@ create or replace package body pl as
               print_null_str in boolean  := true )
   return varchar2
   is
-    result varchar2(150);
+    result varchar2(1000);
   begin
     if date_value is null then
       if print_null_str then
@@ -134,7 +143,7 @@ create or replace package body pl as
               print_null_str in boolean  := true )
   return varchar2
   is
-    result varchar2(150);
+    result varchar2(1000);
   begin
     if date_value is null then
       if print_null_str then
@@ -154,7 +163,7 @@ create or replace package body pl as
               print_null_str in boolean  := true )
   return varchar2
   is
-    result varchar2(150);
+    result varchar2(1000);
   begin
     if date_value is null then
       if print_null_str then
@@ -174,7 +183,7 @@ create or replace package body pl as
               print_null_str in boolean  := true )
   return varchar2
   is
-    result varchar2(150);
+    result varchar2(1000);
   begin
     if date_value is null then
       if print_null_str then
