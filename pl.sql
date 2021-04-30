@@ -1,46 +1,56 @@
 create or replace package pl as
 
-  /* Перегруженные функции для приведения переменных базовых типов к строке
-   * По умолчанию или при передаче true параметру print_null_str null-значения подменяются на строку 'null'
+  /* Override functions "p" - Casts value of basic type to varchar2 and returns string
+   * @param value - value to cast
+   * @param print_null_str - if true (default) returns null value as string 'null'. Else returns null string
+   * @param format - (for dates and number types and their derivatives only) - cast format
    */
   function p (str_value      in varchar2,
               print_null_str in boolean := true)
   return varchar2;
 
+  -- @override
   function p (bool_value     in boolean,
               print_null_str in boolean := true)
   return varchar2;
 
+  -- @override
   function p (num_value      in number,
               format         in varchar2 := null,
               print_null_str in boolean := true)
   return varchar2;
 
+  -- @override
   function p( date_value     in date,
               format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss',
               print_null_str in boolean  := true )
   return varchar2;
 
+  -- @override
   function p( date_value     in timestamp,
               format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss.ff',
               print_null_str in boolean  := true )
   return varchar2;
 
+  -- @override
   function p( date_value     in timestamp with time zone,
               format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss.ff tzh:tzm',
               print_null_str in boolean  := true )
   return varchar2;
 
+  -- @override
   function p( date_value     in timestamp with local time zone,
               format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss.ff',
               print_null_str in boolean  := true )
   return varchar2;
 
-  /* Функция формирования строки для логирования путем конкатенации строк через разделитель
-   * Разделитель добляется только если строка которую хотели добавить не null
-   * При передаче true в параметр force_add_separator, разделитель  будет добавлен в любом случае.
-   * Это может быть нужно когда ожидается жесткий порядок значений в строке
-   * Параметром limit_length регулируется максимальная длина возвращаемой строки
+  /* Function for forming a string for logging by concatenating strings through a separator
+   * The separator is applied only if value for add is not null
+   * @param cur_message - original string to which the value is appended
+   * @param add_text - vale to append
+   * @param separator - separator for values
+   * @param force_add_sepator - if true the separator will be added even value is null
+   * @param limit_length - maximum length of the returned string
    */
   function fm( cur_message   in varchar2,
                add_text      in varchar2,
@@ -49,6 +59,7 @@ create or replace package pl as
                limit_length  in integer := 32767 )
   return varchar2;
 
+  -- @override
   procedure fm( cur_message   in out varchar2,
                 add_text      in     varchar2,
                 separator     in     varchar2 := ', ',
@@ -62,10 +73,12 @@ show errors
 
 create or replace package body pl as
 
-  null_str constant varchar2(5 char) := 'null';
+  null_str constant varchar2(4 char) := 'null';
 
-  /* Перегруженные функции для приведения переменных базовых типов к строке
-   * По умолчанию или при передаче true параметру print_null_str null-значения подменяются на строку 'null'
+  /* Override functions "p" - Casts value of basic type to varchar2 and returns string
+   * @param value - value to cast
+   * @param print_null_str - if true (default) returns null value as string 'null'. Else returns null string
+   * @param format - (for dates and number types and their derivatives only) - cast format
    */
   function p( str_value      in varchar2,
               print_null_str in boolean := true )
@@ -79,6 +92,7 @@ create or replace package body pl as
     return str_value;
   end p;
 
+  -- @override
   function p( bool_value     in boolean,
               print_null_str in boolean := true )
   return varchar2
@@ -98,6 +112,7 @@ create or replace package body pl as
     return result;
   end p;
 
+  -- @override
   function p( num_value      in number,
               format         in varchar2 := null,
               print_null_str in boolean  := true )
@@ -118,6 +133,7 @@ create or replace package body pl as
     return result;
   end p;
 
+  -- @override
   function p( date_value     in date,
               format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss',
               print_null_str in boolean  := true )
@@ -138,6 +154,7 @@ create or replace package body pl as
     return result;
   end p;
 
+  -- @override
   function p( date_value     in timestamp,
               format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss.ff',
               print_null_str in boolean  := true )
@@ -158,6 +175,7 @@ create or replace package body pl as
     return result;
   end p;
 
+  -- @override
   function p( date_value     in timestamp with time zone,
               format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss.ff tzh:tzm',
               print_null_str in boolean  := true )
@@ -178,6 +196,7 @@ create or replace package body pl as
     return result;
   end p;
 
+  -- @override
   function p( date_value     in timestamp with local time zone,
               format         in varchar2 := 'dd.mm.yyyy hh24:mi:ss.ff',
               print_null_str in boolean  := true )
@@ -198,11 +217,13 @@ create or replace package body pl as
     return result;
   end p;
 
-  /* Функция формирования строки для логирования путем конкатенации строк через разделитель
-   * Разделитель добляется только если строка которую хотели добавить не null
-   * При передаче true в параметр force_add_separator, разделитель  будет добавлен в любом случае.
-   * Это может быть нужно когда ожидается жесткий порядок значений в строке
-   * Параметром limit_length регулируется максимальная длина возвращаемой строки
+  /* Function for forming a string for logging by concatenating strings through a separator
+   * The separator is applied only if value for add is not null
+   * @param cur_message - original string to which the value is appended
+   * @param add_text - vale to append
+   * @param separator - separator for values
+   * @param force_add_sepator - if true the separator will be added even value is null
+   * @param limit_length - maximum length of the returned string
    */
   function fm( cur_message   in varchar2,
                add_text      in varchar2,
@@ -229,6 +250,7 @@ create or replace package body pl as
     return substr(result, 1, limit);
   end fm;
 
+  -- @override
   procedure fm( cur_message   in out varchar2,
                 add_text      in     varchar2,
                 separator     in     varchar2 := ', ',
